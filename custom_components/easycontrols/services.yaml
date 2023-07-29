@@ -49,3 +49,24 @@ stop_party_mode:
           filter:
             integration: easycontrols
             domain: fan
+set_fan_stage:
+  name: "Set Fan Stage"
+  description: "Sets the fan stage"
+  fields:
+    entity_id:
+      name: "Helios Device"
+      example: "fan.helios"
+      default: "fan.helios"
+      required: true
+      selector:
+        entity:
+          filter:
+            integration: easycontrols
+            domain: fan
+    stage:
+      name: "Fan Stage"
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 4
