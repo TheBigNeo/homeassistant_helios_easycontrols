@@ -42,7 +42,8 @@ class EasyControlsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             try:
                 controller = AsyncEazyController(user_input[CONF_HOST])
-                # device_type = await controller.get_variable(VARIABLE_ARTICLE_DESCRIPTION.name, VARIABLE_ARTICLE_DESCRIPTION.size)
+                # device_type = await controller.get_variable
+                # (VARIABLE_ARTICLE_DESCRIPTION.name, VARIABLE_ARTICLE_DESCRIPTION.size)
                 device_type = FIX_ARTICLE_DESCRIPTION
                 mac_address = await controller.get_variable(
                     VARIABLE_MAC_ADDRESS.name, VARIABLE_MAC_ADDRESS.size
