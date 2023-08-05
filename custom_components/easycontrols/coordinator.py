@@ -18,7 +18,7 @@ from typing_extensions import Self
 
 from custom_components.easycontrols.const import (
     FIX_ARTICLE_DESCRIPTION,
-    VARIABLE_ARTICLE_DESCRIPTION,
+    # VARIABLE_ARTICLE_DESCRIPTION,
     VARIABLE_BYPASS,
     VARIABLE_BYPASS_EXTRACT_AIR_TEMPERATURE,
     VARIABLE_BYPASS_FROM_DAY,

@@ -10,7 +10,7 @@ from homeassistant.data_entry_flow import FlowResult
 
 from custom_components.easycontrols.const import (
     DOMAIN,
-    VARIABLE_ARTICLE_DESCRIPTION,
+    # VARIABLE_ARTICLE_DESCRIPTION,
     VARIABLE_MAC_ADDRESS,
     FIX_ARTICLE_DESCRIPTION
 )
