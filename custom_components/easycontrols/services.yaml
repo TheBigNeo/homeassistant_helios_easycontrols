@@ -57,6 +57,7 @@ set_fan_stage:
   fields:
     entity_id:
       name: "Helios Device"
+      description: "Device to set the fan stage"
       example: "fan.helios"
       default: "fan.helios"
       required: true
@@ -67,6 +68,7 @@ set_fan_stage:
             domain: fan
     stage:
       name: "Fan Stage"
+      description: "The fan stage to set"
       required: true
       selector:
         number:
