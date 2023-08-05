@@ -1,4 +1,5 @@
 start_party_mode:
+  name: Start Party Mode
   description: Starts the party mode for a limited time.
   fields:
     entity_id:
@@ -36,6 +37,7 @@ start_party_mode:
           min: 5
           max: 180
 stop_party_mode:
+  name: Stop Party Mode
   description: Stops the party mode.
   fields:
     entity_id:
