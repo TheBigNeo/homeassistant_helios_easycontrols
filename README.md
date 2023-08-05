@@ -1,11 +1,12 @@
 # homeassistant-easycontrols
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://github.com/hacs/integration)
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/laszlojakab/homeassistant-easycontrols)
-![GitHub](https://img.shields.io/github/license/laszlojakab/homeassistant-easycontrols)
-![GitHub all releases](https://img.shields.io/github/downloads/laszlojakab/homeassistant-easycontrols/total)
-[![HA integration usage](https://img.shields.io/badge/dynamic/json?color=41BDF5&logo=home-assistant&label=integration%20usage&suffix=%20installs&cacheSeconds=15600&url=https://analytics.home-assistant.io/custom_integrations.json&query=$.easycontrols.total)](https://analytics.home-assistant.io/custom_integrations.json)
-[![Donate](https://img.shields.io/badge/donate-Coffee-yellow.svg)](https://www.buymeacoffee.com/laszlojakab)
+[//]: # ([![hacs_badge]&#40;https://img.shields.io/badge/HACS-Default-41BDF5.svg&#41;]&#40;https://github.com/hacs/integration&#41;)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/TheBigNeo/homeassistant_helios_easycontrols)
+
+[//]: # (![GitHub]&#40;https://img.shields.io/github/license/laszlojakab/homeassistant-easycontrols&#41;)
+[//]: # (![GitHub all releases]&#40;https://img.shields.io/github/downloads/laszlojakab/homeassistant-easycontrols/total&#41;)
+[//]: # ([![HA integration usage]&#40;https://img.shields.io/badge/dynamic/json?color=41BDF5&logo=home-assistant&label=integration%20usage&suffix=%20installs&cacheSeconds=15600&url=https://analytics.home-assistant.io/custom_integrations.json&query=$.easycontrols.total&#41;]&#40;https://analytics.home-assistant.io/custom_integrations.json&#41;)
+[//]: # ([![Donate]&#40;https://img.shields.io/badge/donate-Coffee-yellow.svg&#41;]&#40;https://www.buymeacoffee.com/laszlojakab&#41;)
 
 Helios EasyControls (2.x) Modbus TCP/IP integration for [Home Assistant](https://www.home-assistant.io/). The integration won't work with EasyControls 3.x version devices.
 
