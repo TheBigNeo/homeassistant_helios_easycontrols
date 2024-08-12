@@ -56,7 +56,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
                 config_entry.data[CONF_HOST],
             )
         except Exception as exception:
-            _LOGGER.exception("Could not create initialize coordinator.", exc_info=True)
+            _LOGGER.exception("Could not create initialize coordinator.")
             raise ConfigEntryNotReady("Error during initialization") from exception
 
         set_coordinator(hass, coordinator)

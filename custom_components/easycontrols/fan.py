@@ -404,7 +404,7 @@ async def async_setup_entry(
     async def handle_stop_party_mode(call: ServiceCall) -> None:  # noqa: ARG001
         await fan.stop_party_mode()
 
-    async def handle_set_fan_stage(call: ServiceCall):
+    async def handle_set_fan_stage(call: ServiceCall) -> None:
         stage = call.data.get("stage", None)
         await fan.set_fan_stage(stage)
 
