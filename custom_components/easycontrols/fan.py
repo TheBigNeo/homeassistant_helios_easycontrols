@@ -410,8 +410,6 @@ async def async_setup_entry(
 
     hass.services.async_register(DOMAIN, SERVICE_START_PARTY_MODE, handle_start_party_mode)
     hass.services.async_register(DOMAIN, SERVICE_STOP_PARTY_MODE, handle_stop_party_mode)
-    hass.services.async_register(
-        DOMAIN, SERVICE_SET_FAN_STAGE, handle_set_fan_stage
-    )
+    hass.services.async_register(DOMAIN, SERVICE_SET_FAN_STAGE, handle_set_fan_stage)
 
     _LOGGER.info("Setting up Helios EasyControls fan device completed.")
