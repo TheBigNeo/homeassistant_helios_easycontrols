@@ -1,20 +1,19 @@
-""" Module of `EasyControlsDataUpdateCoordinator` class. """
+"""Module of `EasyControlsDataUpdateCoordinator` class."""
+
 import asyncio
 import logging
 import re
 from asyncio import Lock
-from collections.abc import Callable
+from collections.abc import Callable, Coroutine
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from queue import PriorityQueue
-from typing import Any, Final, overload
+from typing import Any, Final, Self, overload
 
 import async_timeout
 from eazyctrl import AsyncEazyController
-from homeassistant.core import CALLBACK_TYPE, callback
+from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
 from homeassistant.helpers.event import async_call_later
-from homeassistant.helpers.typing import HomeAssistantType
-from typing_extensions import Self
 
 from custom_components.easycontrols.const import (
     FIX_ARTICLE_DESCRIPTION,
@@ -68,7 +67,6 @@ from custom_components.easycontrols.modbus_variable import (
     ModbusVariable,
     OperationHoursModbusVariable,
     StrModbusVariable,
-    TModBusVariableValue,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -78,25 +76,19 @@ _LOGGER = logging.getLogger(__name__)
 class QueueItem:
     """Represents a queue item of the coordinator."""
 
-    # pylint: disable=invalid-name
     variable: Final[ModbusVariable]
     """The modbus variable in the queue."""
-    # pylint: disable=invalid-name
     refresh_interval: Final[timedelta]
     """The refresh interval of the variable."""
 
-    def __lt__(self, other: Any):
-        """
-        Less than operator, to be able to use QueueItem in PriorityQueue.
-        """
-
+    def __lt__(self: Self, other: object) -> bool:
+        """Less than operator, to be able to use QueueItem in PriorityQueue."""
         if isinstance(other, QueueItem):
             return self.variable.name < other.variable.name
 
         raise NotImplementedError(f"`<` not implemented for {type(other)}")
 
 
-# pylint: disable=too-many-instance-attributes
 class EasyControlsDataUpdateCoordinator:
     """
     Responsible to handle querying data from Helios device.
@@ -110,7 +102,7 @@ class EasyControlsDataUpdateCoordinator:
     as soon as possible.
     """
 
-    def __init__(self: Self, hass: HomeAssistantType, device_name: str, host: str):
+    def __init__(self: Self, hass: HomeAssistant, device_name: str, host: str):
         """
         Initialize a new instance of `EasyControlsDataUpdaterCoordinator` class.
 
@@ -121,6 +113,7 @@ class EasyControlsDataUpdateCoordinator:
                 The name of the device.
             host:
                 The host name of the device.
+
         """
         self.host: Final[str] = host
         """ The host name of the device. """
@@ -150,9 +143,7 @@ class EasyControlsDataUpdateCoordinator:
         self._dispose_schedule_items: CALLBACK_TYPE | None = None
         self._disposed: bool = False
 
-        self._variable_listeners: dict[
-            str, list[Callable[[ModbusVariable, Any], None]]
-        ] = {}
+        self._variable_listeners: dict[str, list[Callable[[ModbusVariable, Any], None]]] = {}
         """
         The dictionary of variable listeners. The key is the variable name,
         the value is the functions to call when the given variable value updated
@@ -207,7 +198,7 @@ class EasyControlsDataUpdateCoordinator:
             # We put the queue item with priority 1 (high) to the queue.
             self._variable_queue.put((1, queue_item))
 
-    async def init(self: Self):
+    async def init(self: Self) -> Self:
         """
         Initializes the coordinator and starts polling the variables
         based on the content of the queue.
@@ -227,44 +218,32 @@ class EasyControlsDataUpdateCoordinator:
 
     @property
     def device_name(self) -> str:
-        """
-        Gets the name of the device.
-        """
+        """Gets the name of the device."""
         return self._device_name
 
     @property
     def mac(self) -> str:
-        """
-        Gets the MAC address of the device.
-        """
+        """Gets the MAC address of the device."""
         return self._mac
 
     @property
     def serial_number(self) -> str:
-        """
-        Gets the serial number of the device.
-        """
+        """Gets the serial number of the device."""
         return self._serial_number
 
     @property
     def article_description(self) -> str:
-        """
-        Gets the article description of the device.
-        """
+        """Gets the article description of the device."""
         return self._article_description
 
     @property
     def version(self) -> str:
-        """
-        Gets the software version of the device.
-        """
+        """Gets the software version of the device."""
         return self._version
 
     @property
     def maximum_air_flow(self) -> float:
-        """
-        Gets the maximum air flow rate of the device.
-        """
+        """Gets the maximum air flow rate of the device."""
         return self._maximum_air_flow
 
     def schedule_update(self: Self, variable: ModbusVariable) -> None:
@@ -276,11 +255,12 @@ class EasyControlsDataUpdateCoordinator:
         Args:
             variable:
                 The variable to update.
+
         """
         # We put the item to queue with priority 1 (high) to update as soon as possible.
         self._variable_queue.put((1, QueueItem(variable, timedelta())))
 
-    def add_listener(
+    def add_listener[TModBusVariableValue](
         self: Self,
         variable: ModbusVariable[TModBusVariableValue],
         listener: Callable[[ModbusVariable, TModBusVariableValue], None],
@@ -293,6 +273,7 @@ class EasyControlsDataUpdateCoordinator:
                 The variable to listen for value update.
             listener:
                 The callback which will be called when the variable updated.
+
         """
         listeners_of_variable = self._variable_listeners.get(variable.name)
         if not listeners_of_variable:
@@ -300,7 +281,7 @@ class EasyControlsDataUpdateCoordinator:
 
         listeners_of_variable.append(listener)
 
-    def remove_listener(
+    def remove_listener[TModBusVariableValue](
         self: Self,
         variable: ModbusVariable[TModBusVariableValue],
         listener: Callable[[ModbusVariable, TModBusVariableValue], None],
@@ -313,6 +294,7 @@ class EasyControlsDataUpdateCoordinator:
                 The variable to listen for value update.
             listener:
                 The callback to listen no more.
+
         """
         listeners_of_variable = self._variable_listeners.get(variable.name)
         if not listeners_of_variable:
@@ -320,7 +302,7 @@ class EasyControlsDataUpdateCoordinator:
 
         listeners_of_variable.remove(listener)
 
-    def unload(self):
+    def unload(self: Self) -> None:
         """
         Stops the processing of queue and removes all
         listeners.
@@ -338,29 +320,24 @@ class EasyControlsDataUpdateCoordinator:
             self._dispose_schedule_items()
             self._variable_listeners.clear()
 
-    async def _process_queue(self) -> None:
+    async def _process_queue(self) -> None:  # noqa: C901
         """
         Processes the items in the update queue. Queries the device for the given
         variables and calls the listeners whenever a value for a variable received.F
         """
         queue_items_to_update_later: list[QueueItem] = []
 
-        # while not self._variable_queue2.empty():
-        #     queue_item: QueueItem = self._variable_queue2.get_nowait()
         while not self._variable_queue.empty():
             queue_item: QueueItem = self._variable_queue.get_nowait()[1]
             try:
                 # We allow maximum 5 seconds to update a single variable
                 async with async_timeout.timeout(5):
-                    listeners_of_variable = self._variable_listeners.get(
-                        queue_item.variable.name
-                    )
+                    listeners_of_variable = self._variable_listeners.get(queue_item.variable.name)
                     # If there is a listener for the variable we get the value from the device.
                     if listeners_of_variable and len(listeners_of_variable) > 0:
                         _LOGGER.debug("Updating variable %s.", queue_item.variable)
                         try:
                             value = await self.get_variable(queue_item.variable)
-                        # pylint: disable=broad-except
                         except Exception:
                             _LOGGER.exception("Failed to get variable value")
                             value = None
@@ -375,9 +352,7 @@ class EasyControlsDataUpdateCoordinator:
                             queue_item.variable,
                         )
             except asyncio.exceptions.TimeoutError:
-                _LOGGER.warning(
-                    "Timeout while updating variable: %s", queue_item.variable
-                )
+                _LOGGER.warning("Timeout while updating variable: %s", queue_item.variable)
 
             # If the queue item refresh interval is not zero
             # we have to update again so we collect it into
@@ -390,12 +365,11 @@ class EasyControlsDataUpdateCoordinator:
         # To do so we put the items back to the queue after the given `refresh_interval` timedelta.
         for queue_item in queue_items_to_update_later:
 
-            def get_put_queue_item_back_callback(queue_item: QueueItem):
+            def get_put_queue_item_back_callback(
+                queue_item: QueueItem,
+            ) -> Callable[[datetime], Coroutine[Any, Any, None] | None]:
                 @callback
-                def put_queue_item_back(
-                    # pylint: disable=unused-argument
-                    exec_time: datetime,
-                ):
+                def put_queue_item_back(exec_time: datetime) -> None:  # noqa: ARG001
                     if not self._disposed:
                         self._variable_queue.put((10, queue_item))
 
@@ -412,10 +386,7 @@ class EasyControlsDataUpdateCoordinator:
         # Finally we process the queue again after 1 seconds.
         # It won't do anything if nothing in the queue after a seconds.
         @callback
-        async def process_queue_again(
-            # pylint: disable=unused-argument
-            exec_time: datetime,
-        ):
+        async def process_queue_again(exec_time: datetime) -> None:  # noqa: ARG001
             await self._process_queue()
 
         self._dispose_schedule_items = async_call_later(
@@ -425,30 +396,24 @@ class EasyControlsDataUpdateCoordinator:
         )
 
     @overload
-    async def get_variable(self, variable: BoolModbusVariable) -> bool:
-        ...
+    async def get_variable(self: Self, variable: BoolModbusVariable) -> bool: ...
 
     @overload
-    async def get_variable(self, variable: FlagModbusVariable) -> int:
-        ...
+    async def get_variable(self: Self, variable: FlagModbusVariable) -> int: ...
 
     @overload
-    async def get_variable(self, variable: FloatModbusVariable) -> float:
-        ...
+    async def get_variable(self: Self, variable: FloatModbusVariable) -> float: ...
 
     @overload
-    async def get_variable(self, variable: IntModbusVariable) -> int:
-        ...
+    async def get_variable(self: Self, variable: IntModbusVariable) -> int: ...
 
     @overload
-    async def get_variable(self, variable: OperationHoursModbusVariable) -> int:
-        ...
+    async def get_variable(self: Self, variable: OperationHoursModbusVariable) -> int: ...
 
     @overload
-    async def get_variable(self, variable: StrModbusVariable) -> str:
-        ...
+    async def get_variable(self: Self, variable: StrModbusVariable) -> str: ...
 
-    async def get_variable(self, variable: ModbusVariable) -> Any:
+    async def get_variable[T](self: Self, variable: ModbusVariable) -> T:
         """
         Gets the specified variable value from the Helios device.
 
@@ -458,6 +423,7 @@ class EasyControlsDataUpdateCoordinator:
 
         Returns:
             The requested variable value.
+
         """
         async with self._lock:
             _LOGGER.debug("Getting %s.", variable.name)
@@ -468,32 +434,26 @@ class EasyControlsDataUpdateCoordinator:
             return value
 
     @overload
-    async def set_variable(self, variable: BoolModbusVariable, value: bool) -> bool:
-        ...
+    async def set_variable(self: Self, variable: BoolModbusVariable, value: bool) -> bool: ...
 
     @overload
-    async def set_variable(self, variable: FlagModbusVariable, value: int) -> bool:
-        ...
+    async def set_variable(self: Self, variable: FlagModbusVariable, value: int) -> bool: ...
 
     @overload
-    async def set_variable(self, variable: FloatModbusVariable, value: float) -> bool:
-        ...
+    async def set_variable(self: Self, variable: FloatModbusVariable, value: float) -> bool: ...
 
     @overload
-    async def set_variable(self, variable: IntModbusVariable, value: int) -> bool:
-        ...
+    async def set_variable(self: Self, variable: IntModbusVariable, value: int) -> bool: ...
 
     @overload
     async def set_variable(
-        self, variable: OperationHoursModbusVariable, value: int
-    ) -> bool:
-        ...
+        self: Self, variable: OperationHoursModbusVariable, value: int
+    ) -> bool: ...
 
     @overload
-    async def set_variable(self, variable: StrModbusVariable, value: str) -> bool:
-        ...
+    async def set_variable(self: Self, variable: StrModbusVariable, value: str) -> bool: ...
 
-    async def set_variable(self, variable: ModbusVariable, value: Any) -> bool:
+    async def set_variable[T](self: Self, variable: ModbusVariable, value: T) -> bool:
         """
         Sets the specified variable value on the Helios device.
 
@@ -503,15 +463,16 @@ class EasyControlsDataUpdateCoordinator:
 
         Returns:
             True if setting of variable succeeded otherwise False.
+
         """
         async with self._lock:
             _LOGGER.debug("Setting %s to %s.", variable.name, value)
-            return await self._eazyctrl.set_variable(
-                variable.name, value, variable.set_converter
-            )
+            return await self._eazyctrl.set_variable(variable.name, value, variable.set_converter)
 
 
-async def create_coordinator(hass: HomeAssistantType, device_name: str, host: str):
+async def create_coordinator(
+    hass: HomeAssistant, device_name: str, host: str
+) -> EasyControlsDataUpdateCoordinator:
     """Creates and initializes a coordinator instance."""
     coordinator = EasyControlsDataUpdateCoordinator(hass, device_name, host)
     return await coordinator.init()
