@@ -29,6 +29,7 @@ from custom_components.easycontrols.const import (
     PRESET_AUTO,
     PRESET_PARTY,
     PRESET_STANDBY,
+    SERVICE_SET_FAN_STAGE,
     SERVICE_START_PARTY_MODE,
     SERVICE_STOP_PARTY_MODE,
     VARIABLE_EXTRACT_AIR_FAN_STAGE,
@@ -284,6 +285,21 @@ class EasyControlsFanDevice(FanEntity):
         await self._coordinator.set_variable(VARIABLE_PARTY_MODE, False)
         self._schedule_variable_updates()
 
+    async def set_fan_stage(self, fan_stage: int) -> None:
+        """
+        Sets the fan stage.
+
+        Args:
+            fan_stage: The fan stage to set.
+
+        """
+        _LOGGER.debug("Set Fan Stage to %s", str(fan_stage))
+        if fan_stage is not None:
+            await self._coordinator.set_variable(
+                VARIABLE_FAN_STAGE, fan_stage
+            )
+        self._schedule_variable_updates()
+
     @classmethod
     def speed_to_fan_stage(cls, speed: str) -> int:
         """
@@ -388,7 +404,12 @@ async def async_setup_entry(
     async def handle_stop_party_mode(call: ServiceCall) -> None:  # noqa: ARG001
         await fan.stop_party_mode()
 
+    async def handle_set_fan_stage(call: ServiceCall) -> None:
+        stage = call.data.get("stage", None)
+        await fan.set_fan_stage(stage)
+
     hass.services.async_register(DOMAIN, SERVICE_START_PARTY_MODE, handle_start_party_mode)
     hass.services.async_register(DOMAIN, SERVICE_STOP_PARTY_MODE, handle_stop_party_mode)
+    hass.services.async_register(DOMAIN, SERVICE_SET_FAN_STAGE, handle_set_fan_stage)
 
     _LOGGER.info("Setting up Helios EasyControls fan device completed.")
