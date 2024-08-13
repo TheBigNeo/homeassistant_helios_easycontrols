@@ -11,9 +11,8 @@ from homeassistant.data_entry_flow import FlowResult
 
 from custom_components.easycontrols.const import (
     DOMAIN,
-    # VARIABLE_ARTICLE_DESCRIPTION,
+    VARIABLE_ARTICLE_DESCRIPTION,
     VARIABLE_MAC_ADDRESS,
-    FIX_ARTICLE_DESCRIPTION
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -35,9 +34,9 @@ class EasyControlsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             try:
                 controller = AsyncEazyController(user_input[CONF_HOST])
-                # device_type = await controller.get_variable
-                # (VARIABLE_ARTICLE_DESCRIPTION.name, VARIABLE_ARTICLE_DESCRIPTION.size)
-                device_type = FIX_ARTICLE_DESCRIPTION
+                device_type = await controller.get_variable(
+                    VARIABLE_ARTICLE_DESCRIPTION.name, VARIABLE_ARTICLE_DESCRIPTION.size
+                )
                 mac_address = await controller.get_variable(
                     VARIABLE_MAC_ADDRESS.name, VARIABLE_MAC_ADDRESS.size
                 )

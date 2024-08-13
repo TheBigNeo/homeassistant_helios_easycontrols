@@ -16,8 +16,7 @@ from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
 from homeassistant.helpers.event import async_call_later
 
 from custom_components.easycontrols.const import (
-    FIX_ARTICLE_DESCRIPTION,
-    # VARIABLE_ARTICLE_DESCRIPTION,
+    VARIABLE_ARTICLE_DESCRIPTION,
     VARIABLE_BYPASS,
     VARIABLE_BYPASS_EXTRACT_AIR_TEMPERATURE,
     VARIABLE_BYPASS_FROM_DAY,
@@ -205,10 +204,7 @@ class EasyControlsDataUpdateCoordinator:
         """
         self._mac = await self.get_variable(VARIABLE_MAC_ADDRESS)
         self._serial_number = await self.get_variable(VARIABLE_SERIAL_NUMBER)
-
-        # Return value is "NoneType"
-        # self._article_description = await self.get_variable(VARIABLE_ARTICLE_DESCRIPTION)
-        self._article_description = FIX_ARTICLE_DESCRIPTION
+        self._article_description = await self.get_variable(VARIABLE_ARTICLE_DESCRIPTION)
         self._version = await self.get_variable(VARIABLE_SOFTWARE_VERSION)
         self._maximum_air_flow = float(re.findall(r"\d+", self._article_description)[0])
 

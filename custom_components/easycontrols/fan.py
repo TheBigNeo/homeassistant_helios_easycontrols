@@ -29,9 +29,9 @@ from custom_components.easycontrols.const import (
     PRESET_AUTO,
     PRESET_PARTY,
     PRESET_STANDBY,
+    SERVICE_SET_FAN_STAGE,
     SERVICE_START_PARTY_MODE,
     SERVICE_STOP_PARTY_MODE,
-    SERVICE_SET_FAN_STAGE,
     VARIABLE_EXTRACT_AIR_FAN_STAGE,
     VARIABLE_EXTRACT_AIR_RPM,
     VARIABLE_FAN_STAGE,
@@ -290,8 +290,8 @@ class EasyControlsFanDevice(FanEntity):
         Sets the fan stage.
 
         Args:
-            fan_stage: int
-               fan_stage: The fan stage to set.
+            fan_stage: The fan stage to set.
+
         """
         _LOGGER.debug("Set Fan Stage to %s", str(fan_stage))
         if fan_stage is not None:
